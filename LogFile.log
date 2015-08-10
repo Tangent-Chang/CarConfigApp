@@ -1,0 +1,2 @@
+Jun 23, 2015 2:36:59 PM CarConfigApp.CarConfigApp_client.CarConfigApp_server.exception.AutoException writeException
+INFO: 2015-06-23 14:36:59  Automobile Exception [ErrorCode = MISSING_MODEL_NAME, ErrorNo = 109, ErrorMsg = no CarConfigApp_client.CarConfigApp_server.model name]
