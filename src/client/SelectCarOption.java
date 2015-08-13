@@ -13,7 +13,7 @@ import java.util.Scanner;
  * Created by Tangent Chang on 7/10/15.
  */
 public class SelectCarOption {
-    private ArrayList<String> modelList;
+
     //public void configureCar(ObjectOutputStream oos, ObjectInputStream ois){
     public void configureCar(Socket client, ObjectOutputStream oos){
         Scanner userInput = new Scanner(System.in);
@@ -22,7 +22,7 @@ public class SelectCarOption {
             //receive model list from server
             InputStream is = client.getInputStream();
             ObjectInputStream ois = new ObjectInputStream(is);
-            modelList = (ArrayList<String>) ois.readObject();
+            ArrayList<String> modelList = (ArrayList<String>) ois.readObject();
             //display list
             for(String each : modelList){
                 System.out.println(each);
@@ -49,11 +49,5 @@ public class SelectCarOption {
             System.out.println("IOException :" + e.toString());
         }
 
-    }
-    public ArrayList<String> getModelList(){
-        if(modelList.isEmpty()){
-            return null;
-        }
-        return modelList;
     }
 }

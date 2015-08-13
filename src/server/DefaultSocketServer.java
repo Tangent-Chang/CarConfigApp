@@ -33,6 +33,7 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
     public void run() {
         if (openConnection()) {
             handleSession();
+            System.out.println("server handle session finished");
             //closeSession();
         }
 
@@ -50,38 +51,46 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
 
     public void handleSession(){
         try {
-            //ois.skip(Long.MAX_VALUE);
-            String clientOption = (String) ois.readObject();
-            System.out.println("from client, clientOption: " + clientOption);
+            while(true) {
+                //ois.skip(Long.MAX_VALUE);
+                String clientOption = (String) ois.readObject();
+                System.out.println("from client, clientOption: " + clientOption);
 
-            if(clientOption.equals("upload")){
-                ois = new ObjectInputStream(sock.getInputStream());
+                if (clientOption.equals("upload")) {
+                    ois = new ObjectInputStream(sock.getInputStream());
 
-                Properties propObj = (Properties) ois.readObject();
-                if(autoServer.buildWithProperty(propObj)){
+                    Properties propObj = (Properties) ois.readObject();
+                    if (autoServer.buildWithProperty(propObj)) {
+                        ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
+                        //oos.flush();
+                        //send confirmation message
+                        oos.writeObject("ok");
+                        System.out.println("Message sent to the client is " + "ok");
+                    }
+                } else if (clientOption.equals("configure")) {
+                    //send CarConfigApp_client.client CarConfigApp_client.CarConfigApp_server.model list
                     ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
-                    //oos.flush();
-                    //send confirmation message
-                    oos.writeObject("ok");
-                    System.out.println("Message sent to the client is " + "ok");
+                    oos.writeObject(autoServer.getModelList());
+                    //receive chosen auto name, then send auto obj
+                    String chosenAutoName = (String) ois.readObject();
+                    autoServer.sendSelectedAuto(oos, chosenAutoName);
+                    //sock.shutdownOutput(); /* important */
+                } else if (clientOption.equals("display")) {
+                    ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
+                    oos.writeObject(autoServer.getModelList());
+                    System.out.println("server sent modelList");
+                } else if (clientOption.equals("select")) {
+                    System.out.println("server receive select");
+                    String chosenAutoName = (String) ois.readObject();
+                    ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
+                    autoServer.sendSelectedAuto(oos, chosenAutoName);
+                } else if (clientOption.equals("exit")) {
+                    //System.exit(0);
+                    closeSession();
+                } else {
+                    System.err.println("Invalid input from client!!!!!!!!!!");
+                    break;
                 }
-            }
-            else if(clientOption.equals("configure")){
-                //send CarConfigApp_client.client CarConfigApp_client.CarConfigApp_server.model list
-                ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
-                oos.writeObject(autoServer.getModelList());
-                
-                //receive chosen auto name, then send auto obj
-                String chosenAutoName = (String) ois.readObject();
-                autoServer.sendSelectedAuto(oos, chosenAutoName);
-                //sock.shutdownOutput(); /* important */
-            }
-            else if(clientOption.equals("exit")){
-                //System.exit(0);
-                closeSession();
-            }
-            else{
-                System.err.println("Invalid input from client!!!!!!!!!!");
             }
 
         }

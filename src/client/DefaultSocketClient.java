@@ -3,11 +3,10 @@ package client;
 import server.SocketClientConstants;
 import server.SocketClientInterface;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -16,14 +15,13 @@ import java.util.Scanner;
 public class DefaultSocketClient extends Thread implements SocketClientInterface, SocketClientConstants {
 
     //private BufferedReader reader;
-    //private BufferedWriter writer;
-    private Socket sock;
+    //private PrintWriter writer;
+    protected Socket sock;
     private ServerSocket serverSocket;
     private String strHost;
     private int iPort;
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
-    private String exit = null;
+    protected ObjectOutputStream oos;
+    protected ObjectInputStream ois;
 
     public DefaultSocketClient(String strHost, int iPort) {
         setPort(iPort);
@@ -45,10 +43,10 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
     }//run
 
     public boolean openConnection(){
-
-
         try {
             sock = new Socket(strHost, iPort);
+            oos = new ObjectOutputStream(sock.getOutputStream());
+            System.out.println("oos is not null");
 
             /*ois = new ObjectInputStream(sock.getInputStream());
             System.out.println("already new ois in client");*/
@@ -68,10 +66,6 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
         userChoice = userInput.nextLine();
 
         try{
-            oos = new ObjectOutputStream(sock.getOutputStream());
-
-            //OutputStream os = sock.getOutputStream();
-            //ObjectOutputStream out = new ObjectOutputStream(os);
             oos.writeObject(userChoice);
 
             if(userChoice.equals("upload")){

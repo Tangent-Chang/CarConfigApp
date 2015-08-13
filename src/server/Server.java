@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 /**
  * Created by Tangent Chang on 7/8/15.
  */
-public class Server implements Runnable{
+public class Server {
     private ServerSocket serverSocket = null;
     private final int serverPort = 8765;  // 要監控的port
 
@@ -36,8 +36,8 @@ public class Server implements Runnable{
         }
     }
 
-    /*public static void main (String arg[]){
+    public static void main (String arg[]){
         Server server = new Server();
         server.run();
-    }*/
+    }
 }

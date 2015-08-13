@@ -30,11 +30,15 @@ public class Driver {
             t2.start();
             t1.start();*/
 
-            Thread tServer = new Thread(new Server());
-            Thread tClient = new Thread(new Client());
-            tServer.start();
+            String[] argu = {};
+            //Thread tServer = new Thread(new Server());
+            //Thread tClient = new Thread(new Client());
+            //tServer.start();
+            Server.main(argu);
             System.out.println("server start in Driver");
-            tClient.start();
+            //tClient.start();
+
+            Client.main(argu);
             System.out.println("client start in Driver");
 
 

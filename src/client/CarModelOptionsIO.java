@@ -12,13 +12,7 @@ import java.util.Scanner;
  * Created by Tangnet Chang on 7/10/15.
  */
 public class CarModelOptionsIO {
-    //BuildAuto auto = new BuildAuto();
-    //Socket CarConfigApp_client.client = new Socket();
-    //private String serverAddress = "127.0.0.1";
-    //private int serverPort = 8765;
 
-    //a. Read data from the Properties file;
-    //create properties object, using the load method, which transfers the object from the CarConfigApp_client.client to CarConfigApp_server.server, using ObjectStream.
     //public void uploadProperty(ObjectOutputStream oos, ObjectInputStream ois){
     public void uploadProperty(Socket client){
         Properties properObj= new Properties();
@@ -46,9 +40,6 @@ public class CarModelOptionsIO {
             //in.close();
             //out.close();
 
-            //b. Receive a response from the Server, verifying that the Car Model object is created successfully.
-
-
         } catch (Exception e) {
             //System.out.println("Socket連線有問題 !");
             System.out.print("Error: " + e);
@@ -56,7 +47,4 @@ public class CarModelOptionsIO {
         }
 
     }
-
-
-    //c. Use CreateAuto interface to build Automobile and handle different type of files, passed in filetype.
 }

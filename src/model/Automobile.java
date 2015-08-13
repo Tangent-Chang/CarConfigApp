@@ -28,15 +28,25 @@ public class Automobile implements Serializable{
     public void setBasePrice(float p){ basePrice = p;}
 
     public OptionSet getOptionset(int setIndex){return optionsets.get(setIndex);}
+    public String getOptionsetName(int setIndex){
+        return optionsets.get(setIndex).getName();
+    }
+
     public void setOptionset(String setName){
         optionsets.add(new OptionSet(setName));
     }
 
     public List<OptionSet> getOptionsets(){ return optionsets;}
+    public ArrayList<String> getOptionsetsNames(){
+        ArrayList<String> setsNames = new ArrayList<String>();
+        for(int i = 0; i < optionsets.size(); i++){
+            setsNames.add(optionsets.get(i).getName());
+        }
+        return setsNames;
+    }
     public void setOptionsets(List<OptionSet> optionsets){
         this.optionsets = optionsets;
     }
-
 
     public synchronized void setOption(int setIndex, String optName, float optPrice){
         //optSets[i] = new OptionSet(setName);
@@ -46,6 +56,14 @@ public class Automobile implements Serializable{
         optionsets.get(findOptionsetByName(setName)).setOption(optName, optPrice);
     }
 
+    public ArrayList<String> getOptionsNames(String setName){
+        ArrayList<String> optionsNames = new ArrayList<>();
+        int setIndex = findOptionsetByName(setName);
+        for(int i = 0; i < getOptionset(setIndex).getOptions().size(); i++){
+            optionsNames.add(getOptionset(setIndex).getOption(i).getName());
+        }
+        return optionsNames;
+    }
 
     public String getChoice(String setName){
         //int i = findOptionsetByName(setName);
@@ -62,8 +80,10 @@ public class Automobile implements Serializable{
     }
     public float getTotalPrice(){
         float sum = basePrice;
-        for(int i = 0; i< choices.size(); i++){
-            sum = sum + choices.get(i).getPrice();
+        for(int i = 0; i< optionsets.size(); i++){
+            String key = optionsets.get(i).getName();
+            float tempPrice = choices.get(key).getPrice();
+            sum = sum + tempPrice;
         }
         return sum;
     }
