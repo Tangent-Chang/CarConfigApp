@@ -22,32 +22,23 @@ public class Automobile implements Serializable{
     public void setMaker(String make) {maker = make;}
     public String getModelName(){return modelName;}
     public void setModelName(String n){ modelName = n;}
-    //public String getModel(){return modelName;}
-    //public void setModel(String n){ modelName = n;}
     public float getBasePrice(){return basePrice;}
     public void setBasePrice(float p){ basePrice = p;}
 
+    public List<OptionSet> getOptionsets(){ return optionsets;}
+    public void setOptionsets(List<OptionSet> optionsets){
+        this.optionsets = optionsets;
+    }
     public OptionSet getOptionset(int setIndex){return optionsets.get(setIndex);}
     public String getOptionsetName(int setIndex){
         return optionsets.get(setIndex).getName();
     }
-
     public void setOptionset(String setName){
         optionsets.add(new OptionSet(setName));
     }
-
-    public List<OptionSet> getOptionsets(){ return optionsets;}
-    public ArrayList<String> getOptionsetsNames(){
-        ArrayList<String> setsNames = new ArrayList<String>();
-        for(int i = 0; i < optionsets.size(); i++){
-            setsNames.add(optionsets.get(i).getName());
-        }
-        return setsNames;
+    public List<OptionSet.Option> getOptions(int setIndex){
+        return getOptionset(setIndex).getOptions();
     }
-    public void setOptionsets(List<OptionSet> optionsets){
-        this.optionsets = optionsets;
-    }
-
     public synchronized void setOption(int setIndex, String optName, float optPrice){
         //optSets[i] = new OptionSet(setName);
         optionsets.get(setIndex).setOption(optName,optPrice);
@@ -55,18 +46,17 @@ public class Automobile implements Serializable{
     public synchronized void setOption(String setName, String optName, float optPrice){
         optionsets.get(findOptionsetByName(setName)).setOption(optName, optPrice);
     }
-
-    public ArrayList<String> getOptionsNames(String setName){
-        ArrayList<String> optionsNames = new ArrayList<>();
+    public String getOptionName(String setName, int optionIndex){
         int setIndex = findOptionsetByName(setName);
-        for(int i = 0; i < getOptionset(setIndex).getOptions().size(); i++){
-            optionsNames.add(getOptionset(setIndex).getOption(i).getName());
-        }
-        return optionsNames;
+        String optionName = getOptionset(setIndex).getOption(optionIndex).getName();
+        return optionName;
     }
-
+    public float getOptionPrice(String setName, int optionIndex){
+        int setIndex = findOptionsetByName(setName);
+        float price = getOptionset(setIndex).getOption(optionIndex).getPrice();
+        return price;
+    }
     public String getChoice(String setName){
-        //int i = findOptionsetByName(setName);
         return choices.get(setName).getName();
     }
     public void setChoice(String setName, String optName){
@@ -139,39 +129,6 @@ public class Automobile implements Serializable{
                 System.out.print(" "+optionsets.get(i).getOption(j).getName()+", "+optionsets.get(i).getOption(j).getPrice()+"\n");
             }
         }
-
-    }
-
-    public void makeChoice(){
-        boolean finish = false;
-
-        while(!finish){
-            //display all optionset names
-            for(OptionSet each : optionsets){
-                System.out.println(each.getName());
-            }
-            //receive user's optionset selection
-            Scanner userInput = new Scanner(System.in);
-            System.out.println("Choose option set: ");
-            String optionsetName = userInput.nextLine();
-
-            //display option set's available choice
-            OptionSet chosenOptionset = optionsets.get(findOptionsetByName(optionsetName));
-            for(OptionSet.Option each : chosenOptionset.getOptions()){
-                System.out.println(each.getName() + "--" + each.getPrice() );
-            }
-
-            //receive user's option value and save it
-            System.out.println("Choose option: ");
-            String optionName = userInput.nextLine();
-            setChoice(optionsetName, optionName);
-            System.out.println("option choice saved");
-
-            System.out.println("Are you done?");
-            if(userInput.nextLine().equals("yes")){ finish = true;}
-        }
-
-        System.out.println("configuration over");
 
     }
 }

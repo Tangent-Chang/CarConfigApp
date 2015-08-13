@@ -50,12 +50,12 @@ public class ServletOptionsets extends HttpServlet{
         out.println("<td>Make/Model</td><td>" + auto.getMaker() + "/" + auto.getModelName() + "</td>");
         out.println("</tr>");
 
-        ArrayList<String> setsNames = auto.getOptionsetsNames();
-        for(String eachSet : setsNames){
-            out.println("<tr><td>" + eachSet+ "</td><td><select name=\""+eachSet+"\">");
-            ArrayList<String> optionsNames = auto.getOptionsNames(eachSet);
-            for(String eachOption : optionsNames){
-                out.println("<option value=\""+eachOption+"\">"+eachOption+"</option>");
+        for(int i = 0; i<auto.getOptionsets().size(); i++){
+            String setName = auto.getOptionsetName(i);
+            out.println("<tr><td>" + setName+ "</td><td><select name=\"" + setName + "\">");
+            for(int j = 0; j<auto.getOptions(i).size(); j++){
+                String optionName = auto.getOptionName(setName, j);
+                out.println("<option value=\"" + optionName + "\">" + optionName + "</option>");
             }
             out.println("</select></td></tr>");
         }
