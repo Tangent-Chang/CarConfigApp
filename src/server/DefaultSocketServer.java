@@ -1,9 +1,6 @@
 package server;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
@@ -13,11 +10,13 @@ import java.util.Properties;
  */
 public class DefaultSocketServer extends Thread implements SocketClientInterface, SocketClientConstants {
 
+    private BufferedReader reader;
+    //protected PrintWriter writer;
     private Socket sock;
     private ServerSocket serverSocket;
     private String strHost;
     private int iPort;
-    private ObjectInputStream ois;
+    //private ObjectInputStream ois;
     IAutoServer autoServer = new BuildCarModelOptions();
 
     public DefaultSocketServer(String strHost, int iPort) {
@@ -41,7 +40,9 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
 
     public boolean openConnection(){
         try {
-            ois = new ObjectInputStream(sock.getInputStream());
+            reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+            //ois = new ObjectInputStream(sock.getInputStream());
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -53,11 +54,13 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
         try {
             while(true) {
                 //ois.skip(Long.MAX_VALUE);
-                String clientOption = (String) ois.readObject();
+                //String clientOption = (String) ois.readObject();
+                System.out.println("wait command");
+                String clientOption = reader.readLine();
                 System.out.println("from client, clientOption: " + clientOption);
 
                 if (clientOption.equals("upload")) {
-                    ois = new ObjectInputStream(sock.getInputStream());
+                    ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
 
                     Properties propObj = (Properties) ois.readObject();
                     if (autoServer.buildWithProperty(propObj)) {
@@ -72,7 +75,10 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
                     ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
                     oos.writeObject(autoServer.getModelList());
                     //receive chosen auto name, then send auto obj
-                    String chosenAutoName = (String) ois.readObject();
+                    //ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
+                    //String chosenAutoName = (String) ois.readObject();
+                    String chosenAutoName = reader.readLine();
+                    oos = new ObjectOutputStream(sock.getOutputStream());
                     autoServer.sendSelectedAuto(oos, chosenAutoName);
                     //sock.shutdownOutput(); /* important */
                 } else if (clientOption.equals("display")) {
@@ -81,12 +87,14 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
                     System.out.println("server sent modelList");
                 } else if (clientOption.equals("select")) {
                     System.out.println("server receive select");
+                    ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
                     String chosenAutoName = (String) ois.readObject();
+                    //String chosenAutoName = reader.readLine();
                     ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
                     autoServer.sendSelectedAuto(oos, chosenAutoName);
                 } else if (clientOption.equals("exit")) {
-                    //System.exit(0);
-                    closeSession();
+                    System.exit(0);
+                    //closeSession();
                 } else {
                     System.err.println("Invalid input from client!!!!!!!!!!");
                     break;

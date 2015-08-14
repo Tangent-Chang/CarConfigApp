@@ -22,15 +22,13 @@ public class Client extends DefaultSocketClient{
 
     public static Client getInstance(){
         if(clientInstance == null){
-            //System.out.println("actually you should not see this line");
             clientInstance = new Client();
-            System.out.println("client instance created, will run");
             clientInstance.openConnection();
         }
         return clientInstance;
     }
 
-    @Override
+    /*@Override
     public void run(){
         while(true) {
             if (openConnection()) {
@@ -39,11 +37,10 @@ public class Client extends DefaultSocketClient{
                 closeSession();
             }
         }
-    }
+    }*/
     public static void main (String arg[]){
         //Client client = new Client();
         if(clientInstance == null){
-            System.out.println("in client main");
             clientInstance = new Client();
         }
         clientInstance.start();
@@ -52,7 +49,8 @@ public class Client extends DefaultSocketClient{
     public ArrayList<String> getModelList(){
         ArrayList<String> modelList = null;
         try{
-            oos.writeObject("display");
+            //oos.writeObject("display");
+            sendOutput("display");
             ois = new ObjectInputStream(sock.getInputStream());
             modelList = (ArrayList<String>) ois.readObject();
         }
@@ -64,9 +62,11 @@ public class Client extends DefaultSocketClient{
     public Automobile getAutoObj(String modelName){
         Automobile auto = null;
         try{
-            oos.writeObject("select");
+            //oos.writeObject("select");
+            sendOutput("select");
             System.out.println("client sent select");
-            oos.writeObject(modelName);
+            //oos.writeObject(modelName);
+            sendOutput(modelName);
             ois = new ObjectInputStream(sock.getInputStream());
             auto  = (Automobile) ois.readObject();
         }
