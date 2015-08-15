@@ -32,7 +32,6 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
     public void run() {
         if (openConnection()) {
             handleSession();
-            System.out.println("server handle session finished");
             //closeSession();
         }
 
@@ -118,6 +117,7 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
         } catch (Exception e) {
             e.printStackTrace();
         }
+        displaySystemMessage("handle session ends");
     }
 
     public void sendOutput(String toClient){
