@@ -10,8 +10,8 @@ import java.util.ArrayList;
  * Created by Tangent Chang on 7/14/15.
  */
 public class Client extends DefaultSocketClient{
-    public static String address = "127.0.0.1";
-    public static int port = 8765;
+    public static final String address = "127.0.0.1";
+    public static final int port = 8765;
     private static Client clientInstance;
     //private Socket socketClient;
     //private InetSocketAddress isa;
@@ -51,8 +51,11 @@ public class Client extends DefaultSocketClient{
         try{
             //oos.writeObject("display");
             sendOutput("display");
-            ois = new ObjectInputStream(sock.getInputStream());
+            System.out.println("enter getModelList, and just sent server display");
+            ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
+            System.out.println("just new ois");
             modelList = (ArrayList<String>) ois.readObject();
+            System.out.println("received model list");
         }
         catch(Exception e){
             System.out.println("IOException :" + e.toString());
@@ -67,7 +70,7 @@ public class Client extends DefaultSocketClient{
             System.out.println("client sent select");
             //oos.writeObject(modelName);
             sendOutput(modelName);
-            ois = new ObjectInputStream(sock.getInputStream());
+            ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
             auto  = (Automobile) ois.readObject();
         }
         catch(Exception e){
