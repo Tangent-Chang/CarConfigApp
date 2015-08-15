@@ -24,6 +24,7 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
     private static final int RETRIEVING = 3;
     //private static final int CONFIGURING = 4;
     private static final int END = 5;
+    private int MODE;
 
     public DefaultSocketServer(String strHost, int iPort) {
         setPort(iPort);
@@ -47,6 +48,7 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
         try {
             reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             writer = new PrintWriter(sock.getOutputStream(), true);
+            MODE = READY;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -56,47 +58,45 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
 
     public void handleSession(){
         displaySystemMessage("handle session");
+        String clientCommand;
+        ObjectOutputStream oos;
         try {
             while(true) {
-                displaySystemMessage("wait command");
-                String clientOption = reader.readLine();
-                displaySystemMessage("received client command, " + clientOption);
-
-                if (clientOption.equals("upload")) {
-                    displaySystemMessage("wait for file");
-                    ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-                    Properties propObj = (Properties) ois.readObject();
-                    if (autoServer.buildWithProperty(propObj)) {
-                        String confirm = "OK";
-                        sendOutput(confirm);
-                        displaySystemMessage("Message sent to the client is " + confirm);
-                    }
-                } else if (clientOption.equals("configure")) {
-                    ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
-                    oos.writeObject(autoServer.getModelList());
-                    String chosenAutoName = reader.readLine();
-                    displaySystemMessage("received chosen model name, " + chosenAutoName);
-                    oos = new ObjectOutputStream(sock.getOutputStream());
-                    autoServer.sendSelectedAuto(oos, chosenAutoName);
-                    displaySystemMessage("sent Auto object");
-                } else if (clientOption.equals("display")) {
-                    ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
-                    oos.writeObject(autoServer.getModelList());
-                    displaySystemMessage("sent model list");
-                } else if (clientOption.equals("select")) {
-                    String chosenAutoName = reader.readLine();
-                    displaySystemMessage("received chosen model name, " + chosenAutoName);
-                    ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
-                    autoServer.sendSelectedAuto(oos, chosenAutoName);
-                    displaySystemMessage("sent Auto object");
-                } else if (clientOption.equals("exit")) {
-                    System.exit(0);
-                } else {
-                    System.err.println("Invalid input from client!!!!!!!!!!");
-                    //break;
+                switch(MODE){
+                    case READY:
+                        displaySystemMessage("ready");
+                        clientCommand = reader.readLine().toLowerCase();
+                        judgeMode(clientCommand);
+                        displaySystemMessage("client command is " + clientCommand);
+                        break;
+                    case UPLOADING:
+                        displaySystemMessage("wait for file");
+                        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
+                        Properties propObj = (Properties) ois.readObject();
+                        if (autoServer.buildWithProperty(propObj)) {
+                            sendOutput("OK");
+                        }
+                        MODE = READY;
+                        break;
+                    case DISPLAYING:
+                        oos = new ObjectOutputStream(sock.getOutputStream());
+                        oos.writeObject(autoServer.getModelList());
+                        displaySystemMessage("sent model list");
+                        MODE = READY;
+                        break;
+                    case RETRIEVING:
+                        String chosenAutoName = reader.readLine();
+                        displaySystemMessage("received chosen model name, " + chosenAutoName);
+                        oos = new ObjectOutputStream(sock.getOutputStream());
+                        autoServer.sendSelectedAuto(oos, chosenAutoName);
+                        displaySystemMessage("sent Auto object");
+                        MODE = READY;
+                        break;
+                    case END:
+                        System.exit(0);
+                        break;
                 }
             }
-
         }
         catch (EOFException eof) {
 
@@ -108,6 +108,7 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
 
     public void sendOutput(String toClient){
         writer.println(toClient);
+        displaySystemMessage("sent \"" + toClient + "\" to client");
     }
 
     public void handleInput(String strInput){
@@ -137,6 +138,27 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
 
     public void displaySystemMessage(String message){
         System.out.println(" [Server: " + message + "]");
+    }
+
+    public void judgeMode(String clientCommand){
+        switch(clientCommand){
+            case "upload":
+                MODE = UPLOADING;
+                break;
+            case "display":
+                MODE = DISPLAYING;
+                break;
+            case "retrieve":
+                MODE = RETRIEVING;
+                break;
+            case "exit":
+                MODE = END;
+                break;
+            default:
+                System.out.println("Invalid command");
+                MODE = READY;
+                break;
+        }
     }
 
 }

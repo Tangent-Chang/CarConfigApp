@@ -47,7 +47,6 @@ public class ServletClient extends DefaultSocketClient{
         ArrayList<String> modelList = null;
         try{
             sendOutput("display");
-            displaySystemMessage("sent display");
             ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
             modelList = (ArrayList<String>) ois.readObject();
         }
@@ -59,8 +58,7 @@ public class ServletClient extends DefaultSocketClient{
     public Automobile getAutoObj(String modelName){
         Automobile auto = null;
         try{
-            sendOutput("select");
-            displaySystemMessage("sent select");
+            sendOutput("retrieve");
             sendOutput(modelName);
             ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
             auto  = (Automobile) ois.readObject();

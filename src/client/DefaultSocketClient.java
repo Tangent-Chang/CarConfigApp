@@ -21,6 +21,14 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
     private String strHost;
     private int iPort;
 
+    private static final int READY = 0;
+    private static final int UPLOADING = 1;
+    private static final int DISPLAYING = 2;
+    private static final int RETRIEVING = 3;
+    private static final int CONFIGURING = 4;
+    private static final int END = 5;
+    private int MODE;
+
     public DefaultSocketClient(){
         setPort(PORT);
         setHost(ADDRESS);
@@ -63,54 +71,61 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
     public void handleSession(){
         displaySystemMessage("handle session");
         Scanner userInput = new Scanner(System.in);
-        String userChoice;
+        SelectCarOption clientSelect = new SelectCarOption();
+        CarModelOptionsIO clientIO = new CarModelOptionsIO();
 
-        while(true) {
-            System.out.println("Enter function: ");
-            userChoice = userInput.nextLine();
-
-            try {
-                sendOutput(userChoice);
-
-                if (userChoice.equals("upload")) {
-                    displaySystemMessage("uploading");
-                    CarModelOptionsIO clientIO = new CarModelOptionsIO();
-                    System.out.println("Enter file name: ");
-                    String fileName = userInput.nextLine();
-                    clientIO.uploadProperty(sock, fileName);
-                    String confirm = reader.readLine();
-                    displaySystemMessage("received server confirmation \"" + confirm + "\"");
-                } else if (userChoice.equals("configure")) {
-                    SelectCarOption clientSelect = new SelectCarOption();
-
-                    displaySystemMessage("displaying");
-                    ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-                    ArrayList<String> modelList = (ArrayList<String>) ois.readObject();
-                    for (String each : modelList) {
-                        System.out.println(each);
-                    }
-
-                    displaySystemMessage("retrieving");
-                    System.out.println("enter model name: ");
-                    String selectedAuto = userInput.nextLine();
-                    sendOutput(selectedAuto);
-                    clientSelect.retrieveCar(sock);
-                    displaySystemMessage("received car");
-                    clientSelect.makeChoice();
-                } else if (userChoice.equals("exit")) {
-                    sendOutput("exit");
-                    System.exit(0);
-                } else {
-                    System.out.println("User choice is not valid!");
+        try {
+            while (true) {
+                switch (MODE) {
+                    case READY:
+                        System.out.println("Enter command (upload, configure, exit): ");
+                        String userCommand = userInput.nextLine().toLowerCase();
+                        judgeMode(userCommand);
+                        break;
+                    case UPLOADING:
+                        sendOutput("upload");
+                        System.out.println("Enter file name: ");
+                        String fileName = userInput.nextLine();
+                        clientIO.uploadProperty(sock, fileName);
+                        String confirm = reader.readLine();
+                        displaySystemMessage("received server confirmation \"" + confirm + "\"");
+                        MODE = READY;
+                        break;
+                    case DISPLAYING:
+                        sendOutput("display");
+                        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
+                        ArrayList<String> modelList = (ArrayList<String>) ois.readObject();
+                        for (String each : modelList) {
+                            System.out.println(each);
+                        }
+                        MODE = RETRIEVING;
+                        break;
+                    case RETRIEVING:
+                        sendOutput("retrieve");
+                        System.out.println("Enter model name: ");
+                        String selectedAuto = userInput.nextLine();
+                        sendOutput(selectedAuto);
+                        clientSelect.retrieveCar(sock);
+                        displaySystemMessage("received car");
+                        MODE = CONFIGURING;
+                        break;
+                    case CONFIGURING:
+                        clientSelect.makeChoice();
+                        break;
+                    case END:
+                        sendOutput("exit");
+                        System.exit(0);
+                        break;
                 }
-            } catch (Exception e) {
-                System.out.println("IOException :" + e.toString());
             }
+        }catch (Exception e) {
+            System.out.println("IOException :" + e.toString());
         }
     }
 
     public void sendOutput(String toServer){
         writer.println(toServer);
+        displaySystemMessage("sent \"" + toServer + "\" to server");
     }
 
     public void handleInput(String strInput){
@@ -140,6 +155,25 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 
     public void displaySystemMessage(String message){
         System.out.println(" [Client: " + message + "]");
+    }
+
+    public void judgeMode(String userCommand){
+        switch(userCommand){
+            case "upload":
+                MODE = UPLOADING;
+                break;
+            case "configure":
+                MODE = DISPLAYING;
+                break;
+            case "exit":
+                MODE = END;
+                break;
+            default:
+                System.out.println("Invalid command");
+                MODE = READY;
+                break;
+
+        }
     }
 }
 
