@@ -20,15 +20,11 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
     private ServerSocket serverSocket;
     private String strHost;
     private int iPort;
-    //protected ObjectOutputStream oos;
-    //protected ObjectInputStream ois;
 
-    private static final int WAITING = 0;
-    private static final int UPLOADING = 1;
-    private static final int DISPLAYING = 2;
-    private static final int RETRIEVING = 3;
-    private static final int CONFIGURING = 4;
-    private static final int END = 5;
+    public DefaultSocketClient(){
+        setPort(PORT);
+        setHost(ADDRESS);
+    }
 
     public DefaultSocketClient(String strHost, int iPort) {
         setPort(iPort);
@@ -38,21 +34,20 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
     public DefaultSocketClient(ServerSocket serverSocket, Socket sock) {
         this.serverSocket = serverSocket;
         this.sock = sock;
-    }
+    }//constructor
 
     public void run() {
-        while(true) {
+        //while(true) {
             if (openConnection()) {
                 handleSession();
                 closeSession();
             }
-        }
+        //}
     }//run
 
     public boolean openConnection(){
         try {
             sock = new Socket(strHost, iPort);
-            //oos = new ObjectOutputStream(sock.getOutputStream());
             writer = new PrintWriter(sock.getOutputStream(), true);
             reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             displaySystemMessage("open connection");
@@ -66,58 +61,51 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
     }
 
     public void handleSession(){
+        displaySystemMessage("handle session");
         Scanner userInput = new Scanner(System.in);
         String userChoice;
-        displaySystemMessage("handle session");
-        System.out.println("Enter function: ");
-        userChoice = userInput.nextLine();
 
-        try{
-            //oos.writeObject(userChoice);
-            sendOutput(userChoice);
+        while(true) {
+            System.out.println("Enter function: ");
+            userChoice = userInput.nextLine();
 
-            if(userChoice.equals("upload")){
-                displaySystemMessage("uploading");
-                CarModelOptionsIO clientIO = new CarModelOptionsIO();
-                //ois = new ObjectInputStream(sock.getInputStream());
-                System.out.println("Enter file name: ");
-                String fileName = userInput.nextLine();
-                clientIO.uploadProperty(sock, fileName);
-                //ois = new ObjectInputStream(sock.getInputStream());
-                //String confirmation = (String) ois.readObject();
-                String confirm = reader.readLine();
-                displaySystemMessage("received server confirmation \"" + confirm + "\"");
-            }
-            else if(userChoice.equals("configure")){
-                SelectCarOption clientSelect = new SelectCarOption();
+            try {
+                sendOutput(userChoice);
 
-                displaySystemMessage("displaying");
-                //clientSelect.showCars(sock, oos);
-                ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-                ArrayList<String> modelList = (ArrayList<String>) ois.readObject();
-                for(String each : modelList){
-                    System.out.println(each);
+                if (userChoice.equals("upload")) {
+                    displaySystemMessage("uploading");
+                    CarModelOptionsIO clientIO = new CarModelOptionsIO();
+                    System.out.println("Enter file name: ");
+                    String fileName = userInput.nextLine();
+                    clientIO.uploadProperty(sock, fileName);
+                    String confirm = reader.readLine();
+                    displaySystemMessage("received server confirmation \"" + confirm + "\"");
+                } else if (userChoice.equals("configure")) {
+                    SelectCarOption clientSelect = new SelectCarOption();
+
+                    displaySystemMessage("displaying");
+                    ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
+                    ArrayList<String> modelList = (ArrayList<String>) ois.readObject();
+                    for (String each : modelList) {
+                        System.out.println(each);
+                    }
+
+                    displaySystemMessage("retrieving");
+                    System.out.println("enter model name: ");
+                    String selectedAuto = userInput.nextLine();
+                    sendOutput(selectedAuto);
+                    clientSelect.retrieveCar(sock);
+                    displaySystemMessage("received car");
+                    clientSelect.makeChoice();
+                } else if (userChoice.equals("exit")) {
+                    sendOutput("exit");
+                    System.exit(0);
+                } else {
+                    System.out.println("User choice is not valid!");
                 }
-
-                displaySystemMessage("retrieving");
-                System.out.println("enter model name: ");
-                String selectedAuto = userInput.nextLine();
-                sendOutput(selectedAuto);
-                clientSelect.retrieveCar(sock);
-                displaySystemMessage("received car");
-                clientSelect.makeChoice();
+            } catch (Exception e) {
+                System.out.println("IOException :" + e.toString());
             }
-            else if(userChoice.equals("exit")){
-                sendOutput("exit");
-                System.exit(0);
-            }
-            else{
-                System.out.println("User choice is not valid!");
-            }
-        }
-        catch(Exception e)
-        {
-            System.out.println("IOException :" + e.toString());
         }
     }
 

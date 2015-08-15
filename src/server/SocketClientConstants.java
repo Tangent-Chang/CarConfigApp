@@ -8,4 +8,6 @@ public interface SocketClientConstants {
     int iDAYTIME_PORT = 13;
     int iSMTP_PORT = 25;
     boolean DEBUG = true;
+    int PORT = 8765;
+    String ADDRESS = "127.0.0.1";
 }

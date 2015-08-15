@@ -1,6 +1,6 @@
 package servlet;
 
-import client.Client;
+import client.ServletClient;
 import model.Automobile;
 
 import javax.servlet.*;
@@ -8,14 +8,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 /**
  * Created by Tangent Chang on 7/24/15.
  */
 @WebServlet(urlPatterns={"/ServletOptionsets"})
 public class ServletOptionsets extends HttpServlet{
-    private Client client;
+    private ServletClient client;
     private HttpSession session;
 
     public ServletOptionsets(){
@@ -24,7 +23,7 @@ public class ServletOptionsets extends HttpServlet{
 
     @Override
     public void init(){
-        client = Client.getInstance();
+        client = ServletClient.getInstance();
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

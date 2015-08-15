@@ -1,14 +1,12 @@
 package servlet;
 
-import client.Client;
+import client.ServletClient;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -20,7 +18,7 @@ import java.util.ArrayList;
 @WebServlet(urlPatterns={"/ServletModel"})
 public class ServletModel extends HttpServlet {
 
-    private Client client;
+    private ServletClient client;
 
     public ServletModel(){
         super();
@@ -28,7 +26,7 @@ public class ServletModel extends HttpServlet {
 
     @Override
     public void init(){
-        client = Client.getInstance();
+        client = ServletClient.getInstance();
     }
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ArrayList<String> modelList = client.getModelList();

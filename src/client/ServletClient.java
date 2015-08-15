@@ -9,20 +9,18 @@ import java.util.ArrayList;
 /**
  * Created by Tangent Chang on 7/14/15.
  */
-public class Client extends DefaultSocketClient{
-    public static final String address = "127.0.0.1";
-    public static final int port = 8765;
-    private static Client clientInstance;
-    //private Socket socketClient;
-    //private InetSocketAddress isa;
+public class ServletClient extends DefaultSocketClient{
+    //public static final String address = "127.0.0.1";
+    //public static final int port = 8765;
+    private static ServletClient clientInstance;
 
-    public Client() {
-        super(address,port);
+    public ServletClient() {
+        super(ADDRESS,PORT);
     }//constructor
 
-    public static Client getInstance(){
+    public static ServletClient getInstance(){
         if(clientInstance == null){
-            clientInstance = new Client();
+            clientInstance = new ServletClient();
             clientInstance.openConnection();
         }
         return clientInstance;
@@ -38,19 +36,18 @@ public class Client extends DefaultSocketClient{
             }
         }
     }*/
-    public static void main (String arg[]){
-        //Client client = new Client();
+    /*public static void main (String arg[]){
         if(clientInstance == null){
-            clientInstance = new Client();
+            clientInstance = new ServletClient();
         }
         clientInstance.start();
-    }
+    }*/
 
     public ArrayList<String> getModelList(){
         ArrayList<String> modelList = null;
         try{
-            //oos.writeObject("display");
             sendOutput("display");
+            displaySystemMessage("sent display");
             ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
             modelList = (ArrayList<String>) ois.readObject();
         }
@@ -62,10 +59,8 @@ public class Client extends DefaultSocketClient{
     public Automobile getAutoObj(String modelName){
         Automobile auto = null;
         try{
-            //oos.writeObject("select");
             sendOutput("select");
             displaySystemMessage("sent select");
-            //oos.writeObject(modelName);
             sendOutput(modelName);
             ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
             auto  = (Automobile) ois.readObject();
