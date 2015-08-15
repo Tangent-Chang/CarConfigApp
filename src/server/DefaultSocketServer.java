@@ -87,9 +87,9 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
                     System.out.println("server sent modelList");
                 } else if (clientOption.equals("select")) {
                     System.out.println("server receive select");
-                    ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-                    String chosenAutoName = (String) ois.readObject();
-                    //String chosenAutoName = reader.readLine();
+                    //ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
+                    //String chosenAutoName = (String) ois.readObject();
+                    String chosenAutoName = reader.readLine();
                     ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
                     autoServer.sendSelectedAuto(oos, chosenAutoName);
                 } else if (clientOption.equals("exit")) {
