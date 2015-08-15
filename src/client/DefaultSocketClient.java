@@ -14,14 +14,14 @@ import java.util.Scanner;
  */
 public class DefaultSocketClient extends Thread implements SocketClientInterface, SocketClientConstants {
 
-    //private BufferedReader reader;
+    private BufferedReader reader;
     protected PrintWriter writer;
     protected Socket sock;
     private ServerSocket serverSocket;
     private String strHost;
     private int iPort;
     //protected ObjectOutputStream oos;
-    protected ObjectInputStream ois;
+    //protected ObjectInputStream ois;
 
     private static final int WAITING = 0;
     private static final int UPLOADING = 1;
@@ -54,6 +54,7 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
             sock = new Socket(strHost, iPort);
             //oos = new ObjectOutputStream(sock.getOutputStream());
             writer = new PrintWriter(sock.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             displaySystemMessage("open connection");
         }
         catch(IOException socketError){
@@ -82,16 +83,17 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
                 System.out.println("Enter file name: ");
                 String fileName = userInput.nextLine();
                 clientIO.uploadProperty(sock, fileName);
-                ois = new ObjectInputStream(sock.getInputStream());
-                String confirmation = (String) ois.readObject();
-                displaySystemMessage("received server confirmation \"" + confirmation + "\"");
+                //ois = new ObjectInputStream(sock.getInputStream());
+                //String confirmation = (String) ois.readObject();
+                String confirm = reader.readLine();
+                displaySystemMessage("received server confirmation \"" + confirm + "\"");
             }
             else if(userChoice.equals("configure")){
                 SelectCarOption clientSelect = new SelectCarOption();
 
                 displaySystemMessage("displaying");
                 //clientSelect.showCars(sock, oos);
-                ois = new ObjectInputStream(sock.getInputStream());
+                ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
                 ArrayList<String> modelList = (ArrayList<String>) ois.readObject();
                 for(String each : modelList){
                     System.out.println(each);
@@ -106,16 +108,15 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
                 clientSelect.makeChoice();
             }
             else if(userChoice.equals("exit")){
+                sendOutput("exit");
                 System.exit(0);
             }
             else{
                 System.out.println("User choice is not valid!");
             }
-
         }
         catch(Exception e)
         {
-            //System.out.println("Socket連線有問題 !" );
             System.out.println("IOException :" + e.toString());
         }
     }
@@ -130,6 +131,8 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 
     public void closeSession(){
         try {
+            writer = null;
+            reader = null;
             sock.close();
             displaySystemMessage("session closed");
         }
@@ -148,7 +151,7 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
     }
 
     public void displaySystemMessage(String message){
-        System.out.println("Client: " + message);
+        System.out.println(" [Client: " + message + "]");
     }
 }
 

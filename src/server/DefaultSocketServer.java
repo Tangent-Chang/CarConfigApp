@@ -11,7 +11,7 @@ import java.util.Properties;
 public class DefaultSocketServer extends Thread implements SocketClientInterface, SocketClientConstants {
 
     private BufferedReader reader;
-    //protected PrintWriter writer;
+    protected PrintWriter writer;
     private Socket sock;
     private ServerSocket serverSocket;
     private String strHost;
@@ -39,8 +39,10 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
     }//run
 
     public boolean openConnection(){
+        displaySystemMessage("open connection");
         try {
             reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+            writer = new PrintWriter(sock.getOutputStream(), true);
             //ois = new ObjectInputStream(sock.getInputStream());
 
         } catch (Exception e) {
@@ -51,24 +53,28 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
     }
 
     public void handleSession(){
+        displaySystemMessage("handle session");
         try {
             while(true) {
                 //ois.skip(Long.MAX_VALUE);
                 //String clientOption = (String) ois.readObject();
-                System.out.println("wait command");
+                displaySystemMessage("wait command");
                 String clientOption = reader.readLine();
-                System.out.println("from client, clientOption: " + clientOption);
+                displaySystemMessage("received client command, " + clientOption);
 
                 if (clientOption.equals("upload")) {
+                    displaySystemMessage("wait for file");
                     ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-
                     Properties propObj = (Properties) ois.readObject();
                     if (autoServer.buildWithProperty(propObj)) {
-                        ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
+                        //ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
                         //oos.flush();
                         //send confirmation message
-                        oos.writeObject("ok");
-                        System.out.println("Message sent to the client is " + "ok");
+                        //oos.writeObject("ok");
+                        //System.out.println("Message sent to the client is " + "ok");
+                        String confirm = "OK";
+                        sendOutput(confirm);
+                        displaySystemMessage("Message sent to the client is " + confirm);
                     }
                 } else if (clientOption.equals("configure")) {
                     //send CarConfigApp_client.client CarConfigApp_client.CarConfigApp_server.model list
@@ -78,26 +84,31 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
                     //ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
                     //String chosenAutoName = (String) ois.readObject();
                     String chosenAutoName = reader.readLine();
+                    displaySystemMessage("received chosen model name, " + chosenAutoName);
                     oos = new ObjectOutputStream(sock.getOutputStream());
                     autoServer.sendSelectedAuto(oos, chosenAutoName);
+                    displaySystemMessage("sent Auto object");
                     //sock.shutdownOutput(); /* important */
                 } else if (clientOption.equals("display")) {
                     ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
                     oos.writeObject(autoServer.getModelList());
-                    System.out.println("server sent modelList");
+                    //System.out.println("server sent modelList");
+                    displaySystemMessage("sent model list");
                 } else if (clientOption.equals("select")) {
-                    System.out.println("server receive select");
+                    //System.out.println("server receive select");
                     //ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
                     //String chosenAutoName = (String) ois.readObject();
                     String chosenAutoName = reader.readLine();
+                    displaySystemMessage("received chosen model name, " + chosenAutoName);
                     ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
                     autoServer.sendSelectedAuto(oos, chosenAutoName);
+                    displaySystemMessage("sent Auto object");
                 } else if (clientOption.equals("exit")) {
                     System.exit(0);
                     //closeSession();
                 } else {
                     System.err.println("Invalid input from client!!!!!!!!!!");
-                    break;
+                    //break;
                 }
             }
 
@@ -109,22 +120,18 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
         }
     }
 
-    /*public void sendOutput(String strOutput){
-        try {
-            writer.write(strOutput, 0, strOutput.length());
-        }
-        catch (IOException e){
-            if (DEBUG) System.out.println
-                    ("Error writing to " + strHost);
-        }
+    public void sendOutput(String toClient){
+        writer.println(toClient);
     }
 
     public void handleInput(String strInput){
         System.out.println(strInput);
-    }*/
+    }
 
     public void closeSession(){
         try {
+            writer = null;
+            reader = null;
             sock.close();
             serverSocket.close();
         }
@@ -140,6 +147,10 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
 
     public void setPort(int iPort){
         this.iPort = iPort;
+    }
+
+    public void displaySystemMessage(String message){
+        System.out.println(" [Server: " + message + "]");
     }
 
 }
