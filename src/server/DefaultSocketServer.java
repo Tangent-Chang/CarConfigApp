@@ -39,7 +39,7 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
     public void run() {
         if (openConnection()) {
             handleSession();
-            //closeSession();
+            closeSession();
         }
     }//run
 
@@ -121,6 +121,7 @@ public class DefaultSocketServer extends Thread implements SocketClientInterface
             reader = null;
             sock.close();
             serverSocket.close();
+            displaySystemMessage("session closed");
         }
         catch (IOException e){
             if (DEBUG) System.err.println

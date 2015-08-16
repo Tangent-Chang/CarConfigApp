@@ -8,12 +8,11 @@ import java.net.ServerSocket;
  */
 public class Server implements SocketClientConstants{
     private ServerSocket serverSocket = null;
-    //private final int serverPort = 8765;  // 要監控的port
 
     public Server() {
         try {
             serverSocket = new ServerSocket(PORT);
-            System.out.println("Listening on port "+ PORT);
+            System.out.println(" [Server: Listening on port "+ PORT + "]");
         } catch (IOException e) {
             System.err.println("Could not listen on port: " + PORT);
             System.exit(1);
@@ -26,7 +25,7 @@ public class Server implements SocketClientConstants{
             while(true){
                 server = new DefaultSocketServer(serverSocket, serverSocket.accept());
                 server.start();
-                System.out.println("server run in Server");
+                System.out.println(" [Server: started]");
             }
         }
         catch (IOException e) {
