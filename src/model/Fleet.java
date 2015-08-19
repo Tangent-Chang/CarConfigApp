@@ -1,5 +1,7 @@
 package model;
 
+import database.ImplAutomobile;
+
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,6 +11,8 @@ import java.util.Map;
  */
 public class Fleet {
     private Map<String, Automobile> autos;
+    private ImplAutomobile sqlAuto = new ImplAutomobile();
+
 
     public Fleet(){
         autos = new LinkedHashMap<String, Automobile>();
@@ -20,11 +24,13 @@ public class Fleet {
     public Automobile getAuto(String key){
         return autos.get(key);
     }
-    public void setAuto(String key){
+    /*public void setAuto(String key){
         autos.put(key, new Automobile());
-    }
+        sqlAuto.addAuto();
+    }*/
     public void setAuto(String key, Automobile auto){
         autos.put(key, auto);
+        sqlAuto.addAuto(auto);
     }
 
     public void updateAutoModelName(String key, String newModelName){
