@@ -14,12 +14,12 @@ import java.util.Properties;
 public class ImplBase {
     protected Connection conn = null;
     protected PreparedStatement stmt = null;
-    protected Properties prop = null;
+    protected Properties propSQL = null;
 
     public ImplBase(){
         try{
-            prop = new Properties();
-            prop.load(new FileInputStream("SQL.properties"));
+            propSQL = new Properties();
+            propSQL.load(new FileInputStream("SQL.properties"));
             setConnection();
         }
         catch (FileNotFoundException e){

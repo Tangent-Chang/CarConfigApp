@@ -23,6 +23,7 @@ public class DBDriver {
             Statement stmt = conn.createStatement();
             Properties prop = new Properties();
             prop.load(new FileInputStream("SQL.properties"));
+
             stmt.executeUpdate(prop.getProperty("DROP_TABLES"));
             stmt.executeUpdate(prop.getProperty("CREATE_AUTOMOBILE"));
             stmt.executeUpdate(prop.getProperty("CREATE_OPTIONSET"));
@@ -32,7 +33,7 @@ public class DBDriver {
             while (rs.next()) {
                 System.out.println(rs.getString(3));
             }
-            //stmt.executeUpdate(prop.getProperty("DROP_TABLES"));
+
 
             dbSource.closeConnection(conn);
 
