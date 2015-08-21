@@ -5,6 +5,7 @@ import model.Automobile;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 /**
  * Created by Tangent Chang on 8/17/15.
@@ -32,5 +33,32 @@ public class ImplOptionset extends ImplBase {
         return setId;
     }
     public void updateOptionset(){}
-    public void deleteOptionset(){}
+    public ArrayList<Integer> findOptionsets(int auto_id){
+        ArrayList<Integer> set_ids = new ArrayList<>();
+        //int[] set_ids = new int[];
+        try{
+            stmt = conn.prepareStatement(propSQL.getProperty("FIND_OPTIONSET"));
+            stmt.setInt(1, auto_id);
+
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                set_ids.add(rs.getInt("set_id"));
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return set_ids;
+    }
+    public void deleteOptionsets(int auto_id){
+        try{
+            stmt = conn.prepareStatement(propSQL.getProperty("DELETE_OPTIONSETS"));
+            stmt.setInt(1, auto_id);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
 }

@@ -46,4 +46,13 @@ public class ImplBase {
             e.printStackTrace();
         }
     }
+
+    public void closeConnection(){
+        try{
+            conn.close();
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
 }

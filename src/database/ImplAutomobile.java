@@ -3,6 +3,7 @@ package database;
 import model.Automobile;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Properties;
 
 
@@ -40,31 +41,58 @@ public class ImplAutomobile extends ImplBase{
                     }
                 }
             }
-            else{
-
-            }
         }
         catch (SQLException e){
             e.printStackTrace();
         }
     }
-    /*public void updateAuto(){
-        try{}
+    public int findAuto(Automobile auto){
+        int auto_id = 0;
+        try{
+            stmt = conn.prepareStatement(propSQL.getProperty("FIND_AUTOMOBILE"));
+            stmt.setString(1, auto.getMaker());
+            stmt.setString(2, auto.getModelName());
+            stmt.setFloat(3, auto.getBasePrice());
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            auto_id = rs.getInt("auto_id");
+        }
         catch (SQLException e){
             e.printStackTrace();
         }
-    }*/
-    /*public void deleteAuto(){
+        return auto_id;
+    }
+    public void updateAuto(int auto_id, Automobile auto){
+        try{
+            stmt = conn.prepareStatement(propSQL.getProperty("UPDATE_AUTOMOBILE"));
+            stmt.setString(1, auto.getMaker());
+            stmt.setString(2, auto.getModelName());
+            stmt.setFloat(3, auto.getBasePrice());
+            stmt.setFloat(4, auto_id);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public void deleteAuto(Automobile auto){
         try{
             ImplOptionset sqlOptionset = new ImplOptionset();
             ImplOption sqlOption = new ImplOption();
-            sqlOption.deleteOption();
-            sqlOptionset.deleteOptionset();
+            int auto_id = findAuto(auto);
+            ArrayList<Integer> set_ids = sqlOptionset.findOptionsets(auto_id);
 
-            deleteAuto();
+            for(int i = 0; i<set_ids.size(); i++){
+                sqlOption.deleteOptions(set_ids.get(i));
+            }
+            sqlOptionset.deleteOptionsets(auto_id);
+
+            stmt = conn.prepareStatement(propSQL.getProperty("DELETE_AUTOMOBILE"));
+            stmt.setInt(1, auto_id);
+            stmt.executeUpdate();
         }
         catch (SQLException e){
             e.printStackTrace();
         }
-    }*/
+    }
 }

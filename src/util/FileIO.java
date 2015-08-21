@@ -21,7 +21,7 @@ public class FileIO {
             boolean eof = false;
 
             String line;
-            for(int i=0; i<2; i++){
+            for(int i=0; i<3; i++){
                 line = buff.readLine();
                 if(line == null){eof = true;}
                 else{
@@ -38,6 +38,9 @@ public class FileIO {
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
+                            }
+                            else if(i == 2){
+                                model.setMaker(array[1]);
                             }
                         }
                         else{

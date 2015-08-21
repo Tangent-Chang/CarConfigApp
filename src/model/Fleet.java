@@ -34,13 +34,19 @@ public class Fleet {
     }
 
     public void updateAutoModelName(String key, String newModelName){
+        int auto_id = sqlAuto.findAuto(autos.get(key));
         autos.get(key).setModelName(newModelName);
+        sqlAuto.updateAuto(auto_id, autos.get(key));
     }
     public void updateAutoMaker(String key, String newMaker){
+        int auto_id = sqlAuto.findAuto(autos.get(key));
         autos.get(key).setMaker(newMaker);
+        sqlAuto.updateAuto(auto_id, autos.get(key));
     }
     public void updateAutoBasePrice(String key, float newPrice){
+        int auto_id = sqlAuto.findAuto(autos.get(key));
         autos.get(key).setBasePrice(newPrice);
+        sqlAuto.updateAuto(auto_id, autos.get(key));
     }
     /*public void updateAuto(String key, String maker, String modelName, float price){
         autos.get(key).setMaker(maker);
@@ -66,6 +72,7 @@ public class Fleet {
     }
 
     public void deleteAuto(String index){
+        sqlAuto.deleteAuto(autos.get(index));
         autos.remove(index);
     }
 }

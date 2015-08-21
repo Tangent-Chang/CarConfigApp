@@ -18,7 +18,7 @@ public class ImplOption extends ImplBase{
             stmt.setFloat(3, optionPrice);
 
             stmt.executeUpdate();
-            stmt.clearParameters();
+            //stmt.clearParameters();
 
             ResultSet key = stmt.getGeneratedKeys();
             if(key.next()){
@@ -31,5 +31,14 @@ public class ImplOption extends ImplBase{
         return optionId;
     }
     public void updateOption(){}
-    public void deleteOption(){}
+    public void deleteOptions(int set_id){
+        try{
+            stmt = conn.prepareStatement(propSQL.getProperty("DELETE_OPTIONS"));
+            stmt.setInt(1, set_id);
+            stmt.executeUpdate();
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
 }
